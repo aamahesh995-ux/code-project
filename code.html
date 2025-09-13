@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindfulMood - Mental Wellness Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #5b6bf0;
+            --secondary: #7c4dff;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+            --dark: #212121;
+            --gray: #6c757d;
+            --bg-light: #f5f7ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+        
+        .user-profile {
+            text-align: center;
+            padding: 15px 0;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .user-streak {
+            color: var(--gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .mood-checker {
+            text-align: center;
+        }
+        
+        .mood-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .mood-options {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .mood-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            padding: 10px;
+            border-radius: 15px;
+        }
+        
+        .mood-option:hover {
+            transform: translateY(-5px);
+            background: rgba(91, 107, 240, 0.1);
+        }
+        
+        .mood-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .mood-label {
+            font-weight: 500;
+        }
+        
+        .mood-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            resize: none;
+            margin: 20px 0;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .recommendations {
+            margin-top: 20px;
+        }
+        
+        .recommendation-list {
+            list-style: none;
+        }
+        
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: var(--bg-light);
+        }
+        
+        .recommendation-item i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 20px;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .mood-options {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .mood-option {
+                flex: 0 0 calc(33.333% - 20px);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            nav ul {
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .mood-option {
+                flex: 0 0 calc(50% - 20px);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>MindfulMood</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="active">Dashboard</a></li>
+                        <li><a href="#">Insights</a></li>
+                        <li><a href="#">Resources</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Profile</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3 class="user-name">Alex Johnson</h3>
+                    <div class="user-streak">
+                        <i class="fas fa-fire"></i>
+                        <span>14-day streak</span>
+                    </div>
+                </div>
+                
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                    <li><a href="#"><i class="fas fa-journal-whills"></i> Journal</a></li>
+                    <li><a href="#"><i class="fas fa-medal"></i> Achievements</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </div>
+
+            <div class="dashboard">
+                <div class="left-column">
+                    <div class="card mood-checker">
+                        <h2 class="mood-title">How are you feeling today?</h2>
+                        <div class="mood-options">
+                            <div class="mood-option" data-mood="excited">
+                                <div class="mood-emoji">😆</div>
+                                <div class="mood-label">Excited</div>
+                            </div>
+                            <div class="mood-option" data-mood="happy">
+                                <div class="mood-emoji">😊</div>
+                                <div class="mood-label">Happy</div>
+                            </div>
+                            <div class="mood-option" data-mood="neutral">
+                                <div class="mood-emoji">😐</div>
+                                <div class="mood-label">Neutral</div>
+                            </div>
+                            <div class="mood-option" data-mood="sad">
+                                <div class="mood-emoji">😔</div>
+                                <div class="mood-label">Sad</div>
+                            </div>
+                            <div class="mood-option" data-mood="stressed">
+                                <div class="mood-emoji">😫</div>
+                                <div class="mood-label">Stressed</div>
+                            </div>
+                        </div>
+                        <textarea class="mood-textarea" placeholder="Tell us more about your day... (optional)"></textarea>
+                        <button class="btn btn-primary" id="submitMood">Submit Check-in</button>
+                        
+                        <div class="recommendations">
+                            <div class="card-header">
+                                <h3 class="card-title">Personalized Recommendations</h3>
+                            </div>
+                            <ul class="recommendation-list">
+                                <li class="recommendation-item">
+                                    <i class="fas fa-walking"></i>
+                                    <div>
+                                        <h4>Take a 10-minute walk</h4>
+                                        <p>Physical activity can boost your mood and reduce stress.</p>
+                                    </div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <i class="fas fa-book"></i>
+                                    <div>
+                                        <h4>Journal for 5 minutes</h4>
+                                        <p>Writing down your thoughts can provide clarity and perspective.</p>
+                                    </div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <i class="fas fa-music"></i>
+                                    <div>
+                                        <h4>Listen to calming music</h4>
+                                        <p>Check out our "Relaxation" playlist for soothing sounds.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Weekly Mood Summary</h3>
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="moodChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Your Stats</h3>
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <i class="fas fa-check-circle"></i>
+                                <div class="stat-value">78%</div>
+                                <div class="stat-label">Consistency</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-trending-up"></i>
+                                <div class="stat-value">+12%</div>
+                                <div class="stat-label">Improvement</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-heart"></i>
+                                <div class="stat-value">6.2</div>
+                                <div class="stat-label">Avg. Mood</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-calendar-check"></i>
+                                <div class="stat-value">14</div>
+                                <div class="stat-label">Check-ins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2023 MindfulMood. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Us</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mood selection
+            const moodOptions = document.querySelectorAll('.mood-option');
+            let selectedMood = null;
+            
+            moodOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    moodOptions.forEach(opt => opt.style.backgroundColor = '');
+                    this.style.backgroundColor = 'rgba(91, 107, 240, 0.2)';
+                    selectedMood = this.getAttribute('data-mood');
+                });
+            });
+            
+            // Mood submission
+            document.getElementById('submitMood').addEventListener('click', function() {
+                if (!selectedMood) {
+                    alert('Please select a mood first!');
+                    return;
+                }
+                
+                const moodText = document.querySelector('.mood-textarea').value;
+                alert(`Thank you for your check-in! Your mood (${selectedMood}) has been recorded
